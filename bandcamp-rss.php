@@ -1,5 +1,7 @@
 <?php
 
+require_once("rss.php");
+
 if ($argc < 2) {
   echo "url missing\n";
   return;
@@ -71,18 +73,11 @@ if (empty($items)) {
 }
 
 
-$rss = new SimpleXMLElement('<rss version="2.0"/>');
-$rss->channel->title = $feedTitle;
-
+$rss = new RSS($feedTitle);
 foreach ($items as list($title, $date, $url, $img)) {
-  $item = $rss->channel->addChild('item');
-  $item->title   = $title;
-  $item->pubDate = $date;
-  $item->guid    = $url;
-  $item->guid['isPermaLink'] = 'true';
-  $item->description = "<img src='$img'/>";
+  $rss->addItem($title, $url, "<img src='$img'/>", $date);
 }
 
-$rss = $rss->asXML();
+$rss = $rss->toString();
 file_put_contents($cacheFile, $rss);
 echo $rss;
